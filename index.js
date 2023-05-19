@@ -36,7 +36,10 @@ async function run() {
        console.log(result)
        res.send(result)
  })
-  
+    app.get('/alltoys', async(req,res)=>{
+        const result = await toyCollection.find().toArray()
+        res.send(result)
+    })
 
 
     // Send a ping to confirm a successful connection
