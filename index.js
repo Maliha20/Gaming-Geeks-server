@@ -26,6 +26,19 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+     
+    const toyCollection = client.db('toyStore').collection('addedToys');
+
+ 
+    app.post('/addtoy', async(req,res)=>{
+        const newToy = req.body;
+       const result = await toyCollection.insertOne(newToy);
+       console.log(result)
+       res.send(result)
+ })
+  
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -34,7 +47,7 @@ async function run() {
 
 
 
-    
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
