@@ -28,18 +28,38 @@ async function run() {
     await client.connect();
      
     const toyCollection = client.db('toyStore').collection('addedToys');
+    
+    const indexKey = {name: 1};
+    const indexOption = {name :"titleSearch"};
+    const result = await toyCollection.createIndex(indexKey,indexOption)
+    
 
- 
+    app.get('/toySearchByName/:text', async(req,res)=>{
+      const searchName = req.params.text;
+
+      const result = await toyCollection.find({
+        $or : [
+          {name: {$regex: searchName, $options: "i"}}
+       
+        ]
+      }).toArray();
+      res.send(result)
+    })
+
+//  for adding toys from users
     app.post('/addtoy', async(req,res)=>{
         const newToy = req.body;
        const result = await toyCollection.insertOne(newToy);
        console.log(result)
        res.send(result)
  })
+//  for all toys section
     app.get('/alltoys', async(req,res)=>{
    const result = await toyCollection.find().toArray()
         res.send(result)
     })
+
+    // for subcategory
     app.get('/alltoys/:category', async(req,res)=>{
       console.log(req.params.category)
       if(req.params.category == "scrabble" || req.params.category == "puzzles" || req.params.category == "carcassonne"){
@@ -47,7 +67,7 @@ async function run() {
         return res.send(result)
       }
     })
-    
+  // for my toys section 
     app.get('/mytoys/:email', async(req,res)=>{
       const result = await toyCollection.find({sellersMail: req.params.email}).toArray()
       res.send(result)
