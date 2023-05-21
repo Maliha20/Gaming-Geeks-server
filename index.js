@@ -25,13 +25,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+     client.connect();
      
     const toyCollection = client.db('toyStore').collection('addedToys');
     
     const indexKey = {name: 1};
     const indexOption = {name :"titleSearch"};
-    const result = await toyCollection.createIndex(indexKey,indexOption)
+    const result = toyCollection.createIndex(indexKey,indexOption)
     
 
     app.get('/toySearchByName/:text', async(req,res)=>{
@@ -54,10 +54,13 @@ async function run() {
        res.send(result)
  })
 //  for all toys section
-    app.get('/alltoys', async(req,res)=>{
-   const result = await toyCollection.find().limit(20).toArray()
-        res.send(result)
-    })
+ 
+  app.get('/alltoys', async (req, res) => {
+    let limit = 20;
+    const result = await toyCollection.find().limit(limit).toArray();
+    res.send(result);
+  });
+
 
     // for subcategory
     app.get('/alltoys/:category', async(req,res)=>{
@@ -78,10 +81,10 @@ async function run() {
   })
   // for my toys section 
     app.get('/addtoy/:email', async(req,res)=>{
-      const result = await toyCollection.find({sellersMail: req.params.email}).toArray()
-      res.send(result)
+      const result = await toyCollection.find({sellersMail: req.params.email}).sort({price: 1}).toArray()
+      res.send(result) 
     })
-     
+
 
     app.delete('/addtoy/:id', async(req,res)=>{
       const id = req.params.id;
