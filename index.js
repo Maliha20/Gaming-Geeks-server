@@ -80,11 +80,23 @@ async function run() {
      
   })
   // for my toys section 
-    app.get('/addtoy/:email', async(req,res)=>{
-      const result = await toyCollection.find({sellersMail: req.params.email}).sort({price: 1}).toArray()
-      res.send(result) 
-    })
-
+  app.get('/addtoy/:email', async (req, res) => {
+    const { email } = req.params;
+    const { sort } = req.query; 
+    const sortOptions = {};
+    if (sort === 'lowtohigh') {
+      sortOptions.price = 1; 
+    } else if (sort === 'hightolow') {
+      sortOptions.price = -1; 
+    }
+  
+    const result = await toyCollection
+      .find({ sellersMail: email })
+      .sort(sortOptions)
+      .toArray();
+  
+    res.send(result);
+  });
 
     app.delete('/addtoy/:id', async(req,res)=>{
       const id = req.params.id;
